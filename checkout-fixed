@@ -2,8 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CheckoutChamp – Fixed Purchase Tracking</title>
+  <title>BugMD | Order Confirmation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Simulated CheckoutChamp styles -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f6f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 6px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+    .header {
+      border-bottom: 2px solid #1ab22c;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      margin: 0;
+      color: #1ab22c;
+    }
+    .order-box {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+    }
+    .cta {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #ff7000;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+  </style>
 
   <!-- Facebook Pixel Base Code -->
   <script>
@@ -19,26 +61,37 @@
     }(window, document, 'script',
       'https://connect.facebook.net/en_US/fbevents.js');
 
-    fbq('init', 'TEST_PIXEL_ID'); // replace if needed
+    fbq('init', '703303070479140'); // REAL pixel
     fbq('track', 'PageView');
   </script>
 </head>
 
 <body>
-  <h1>Order Confirmed</h1>
-  <p>This simulates a CheckoutChamp post-purchase page.</p>
 
+  <div class="container">
+    <div class="header">
+      <h1>Thank you for your order!</h1>
+      <p>Your purchase has been successfully processed.</p>
+    </div>
+
+    <div class="order-box">
+      <p><strong>Order ID:</strong> <span id="order-id">—</span></p>
+      <p><strong>Order Total:</strong> $136.44</p>
+    </div>
+
+    <p>Before you go, we have a special one-time offer for you:</p>
+    <a href="/upsell2" class="cta">View Special Offer</a>
+  </div>
+
+  <!-- ✅ FIXED PURCHASE TRACKING (CheckoutChamp-safe) -->
   <script>
     (function () {
-      /**
-       * CheckoutChamp-Safe Purchase Tracking
-       */
 
       const PURCHASE_LOCK_KEY = 'cc_purchase_fired';
 
       function isPurchaseEligiblePage() {
-        // Only Upsell1 (first post-purchase step) is allowed
-        return window.location.pathname.includes('upsell1');
+        // Only Upsell1 (first post-purchase step)
+        return window.location.pathname.includes('/upsell1');
       }
 
       if (!isPurchaseEligiblePage()) {
@@ -56,6 +109,9 @@
         params.get('orderId') ||
         'order-' + Date.now();
 
+      // Display order ID on page (realistic)
+      document.getElementById('order-id').textContent = orderId;
+
       fbq('track', 'Purchase', {
         value: 136.44,
         currency: 'USD'
@@ -66,7 +122,9 @@
       sessionStorage.setItem(PURCHASE_LOCK_KEY, 'true');
 
       console.log('[CC] Purchase fired once with event_id:', orderId);
+
     })();
   </script>
+
 </body>
 </html>
