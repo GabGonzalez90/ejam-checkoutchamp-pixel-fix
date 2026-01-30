@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CheckoutChamp – Fixed Purchase Tracking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Facebook Pixel Base Code -->
+  <script>
+    !function(f,b,e,v,n,t,s){
+      if(f.fbq)return;n=f.fbq=function(){
+        n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments)
+      };
+      if(!f._fbq)f._fbq=n;
+      n.push=n; n.loaded=!0; n.version='2.0';
+      n.queue=[]; t=b.createElement(e); t.async=!0;
+      t.src=v; s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+
+    fbq('init', 'TEST_PIXEL_ID'); // replace if needed
+    fbq('track', 'PageView');
+  </script>
+</head>
+
+<body>
+  <h1>Order Confirmed</h1>
+  <p>This simulates a CheckoutChamp post-purchase page.</p>
+
+  <script>
+    (function () {
+      /**
+       * CheckoutChamp-Safe Purchase Tracking
+       */
+
+      const PURCHASE_LOCK_KEY = 'cc_purchase_fired';
+
+      function isPurchaseEligiblePage() {
+        // Only Upsell1 (first post-purchase step) is allowed
+        return window.location.pathname.includes('upsell1');
+      }
+
+      if (!isPurchaseEligiblePage()) {
+        console.log('[CC] Purchase blocked — not eligible page');
+        return;
+      }
+
+      if (sessionStorage.getItem(PURCHASE_LOCK_KEY)) {
+        console.log('[CC] Purchase already fired — skipping');
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const orderId =
+        params.get('orderId') ||
+        'order-' + Date.now();
+
+      fbq('track', 'Purchase', {
+        value: 136.44,
+        currency: 'USD'
+      }, {
+        eventID: orderId
+      });
+
+      sessionStorage.setItem(PURCHASE_LOCK_KEY, 'true');
+
+      console.log('[CC] Purchase fired once with event_id:', orderId);
+    })();
+  </script>
+</body>
+</html>
